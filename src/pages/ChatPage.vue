@@ -1,9 +1,13 @@
 <template>
-  <div><input type="text" v-model="messageInput" /></div>
+  <div class="chat-container">
+    <div class="chat-box" v-for="(message, index) in messageList" :key="index">{{ message }}</div>
+    <div class="chat-box" v-if="isTyping">{{ currentResponse }}</div>
+  </div>
+  <div><input type="text" v-model="messageInput" @keydown.enter="sendMessage" /></div>
   <div><button @click="sendMessage">发送</button></div>
 </template>
 <script lang="ts" setup>
-import { ref } from "vue"
+import { nextTick, ref } from "vue"
 
 const api = "http://localhost:9902/v1/chat/completions"
 const headers = {
@@ -11,15 +15,34 @@ const headers = {
   Authorization: "Bearer 123456",
 }
 const messageInput = ref<string>("")
+const messageList = ref<Message[]>([])
+const isLoading = ref<boolean>(false)
+const isTyping = ref<boolean>(false)
+const currentResponse = ref<string>("")
+
+interface Message {
+  role: "user" | "assistant"
+  content: string
+}
 
 async function sendMessage() {
+  if (isLoading.value) return
+
+  const userMessage = messageInput.value
+  if (!userMessage.trim()) return
+
+  messageList.value.push(buildMessage("user", userMessage))
+
+  messageInput.value = ""
+
+  isLoading.value = true
+  isTyping.value = true
+  currentResponse.value = ""
+
   let accumulatedContent = ""
   const body = {
     model: "Qwen/Qwen3-30B-A3B",
-    messages: [
-      { role: "system", content: "You are a helpful assistant." },
-      { role: "user", content: messageInput.value },
-    ],
+    messages: messageList.value,
     stream: true,
   }
 
@@ -50,7 +73,7 @@ async function sendMessage() {
 
             if (jsonString === "[DONE]") {
               reader.cancel()
-              return
+              messageList.value.push(buildMessage("assistant", accumulatedContent))
             }
 
             try {
@@ -59,7 +82,9 @@ async function sendMessage() {
 
               if (content) {
                 accumulatedContent += content
-                console.log(accumulatedContent)
+                currentResponse.value = accumulatedContent
+                await nextTick()
+                scrollToBottom()
               }
             } catch (error) {
               console.error(error)
@@ -72,7 +97,37 @@ async function sendMessage() {
     }
   } catch (error) {
     console.error(error)
+  } finally {
+    isLoading.value = false
+    isTyping.value = false
+    currentResponse.value = ""
   }
 }
+
+function scrollToBottom() {
+  const container = document.querySelector(".chat-container")
+  if (container) {
+    container.scrollTop = container.scrollHeight
+  }
+}
+
+function buildMessage(role: "user" | "assistant", message: string): Message {
+  return { role: role, content: message }
+}
 </script>
-<style scoped></style>
+<style scoped>
+.chat-container {
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.chat-box {
+  margin-bottom: 10px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+</style>
