@@ -5,9 +5,11 @@
   </div>
   <div><input type="text" v-model="messageInput" @keydown.enter="sendMessage" /></div>
   <div><button @click="sendMessage">发送</button></div>
+  <UploadFile />
 </template>
 <script lang="ts" setup>
 import { nextTick, ref } from "vue"
+import UploadFile from "@/components/UploadFile.vue"
 
 const api = "http://localhost:9902/v1/chat/completions"
 const headers = {
