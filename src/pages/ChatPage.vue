@@ -1,15 +1,265 @@
 <template>
-  <div class="chat-container">
-    <div class="chat-box" v-for="(message, index) in messageList" :key="index">{{ message }}</div>
-    <div class="chat-box" v-if="isTyping">{{ currentResponse }}</div>
+  <div class="flex items-center justify-between h-screen">
+    <div class="bg-gray-400 w-1/5 h-full">
+      <div class="h-[90%] overflow-y-auto">
+        <div
+          class="item border-gray-500 border-t cursor-pointer hover:bg-gray-300 p-2 bg-white"
+          v-for="item in items"
+          :key="item.id"
+        >
+          <a href="#"></a>
+          <div class="flex justify-between items-center text-sm leading-5 text-gray-500">
+            <span>{{ item.selectedModel }}</span>
+            <span>{{ item.updatedAt }}</span>
+          </div>
+          <h2 class="font-semibold leading-6 text-gray-900 truncate">{{ item.title }}</h2>
+        </div>
+      </div>
+      <div class="h-[10%] grid grid-cols-2 gap-2 p-2">
+        <button
+          class="inline-flex items-center justify-center bg-green-700 text-white hover:bg-green-700/90 h-full rounded-md"
+        >
+          1
+        </button>
+        <button
+          class="inline-flex items-center justify-center bg-green-50 text-green-700 hover:bg-green-700/90 h-full] rounded-md"
+        >
+          1
+        </button>
+      </div>
+    </div>
+    <div class="bg-blue-400 flex-1 h-full">
+      <div class="grid grid-rows-2 p-2 h-full">
+        <div class="border inline-grid">1</div>
+        <div class="border inline-grid">
+          <input
+            class="border border-t rounded-sm"
+            type="text"
+            v-model="messageInput"
+            @keydown.enter="sendMessage"
+          />
+          <button class="border border-t rounded-sm" @click="sendMessage">发送</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <div><input type="text" v-model="messageInput" @keydown.enter="sendMessage" /></div>
-  <div><button @click="sendMessage">发送</button></div>
-  <UploadFile />
 </template>
 <script lang="ts" setup>
 import { nextTick, ref } from "vue"
-import UploadFile from "@/components/UploadFile.vue"
+import type { ConversationProps } from "../types"
+
+const options = [
+  {
+    value: "Option1",
+    label: "Option1",
+  },
+  {
+    value: "Option2",
+    label: "Option2",
+  },
+  {
+    value: "Option3",
+    label: "Option3",
+  },
+  {
+    value: "Option4",
+    label: "Option4",
+  },
+  {
+    value: "Option5",
+    label: "Option5",
+  },
+]
+
+const items: ConversationProps[] = [
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title:
+      "你好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title:
+      "你好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title:
+      "你好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好好",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+  {
+    id: 1,
+    title: "Chat1",
+    selectedModel: "Qwen/Qwen3-30B-A3B",
+    createdAt: "2023-05-01T12:00:00Z",
+    updatedAt: "2023-05-01T12:00:00Z",
+    providerId: "1",
+  },
+]
 
 const api = "http://localhost:9902/v1/chat/completions"
 const headers = {
@@ -117,19 +367,3 @@ function buildMessage(role: "user" | "assistant", message: string): Message {
   return { role: role, content: message }
 }
 </script>
-<style scoped>
-.chat-container {
-  height: 400px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-  padding: 10px;
-}
-
-.chat-box {
-  margin-bottom: 10px;
-  padding: 8px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-}
-</style>
